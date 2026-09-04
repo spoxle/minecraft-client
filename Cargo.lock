@@ -3094,7 +3094,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mc-client"
+name = "mc-manager"
 version = "0.1.0"
 dependencies = [
  "directories",
