@@ -34,6 +34,12 @@ pub struct Sidebar {
 }
 
 impl Sidebar {
+	pub fn new() -> Self {
+		Self {
+			active_tab: SidebarTab::Library,
+		}
+	}
+
 	fn render_button(
 		&self,
 		tab: SidebarTab,

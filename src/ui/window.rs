@@ -24,11 +24,8 @@ impl WindowView {
 					},
 					|_, cx| {
 						cx.new(|cx| WindowView {
-							sidebar: cx.new(|_| sidebar::Sidebar {
-								active_tab: sidebar::SidebarTab::Library,
-							}),
-							footer: cx
-								.new(|_| footer::Footer { current_task: None }),
+							sidebar: cx.new(|_| sidebar::Sidebar::new()),
+							footer: cx.new(|_| footer::Footer::new()),
 						})
 					},
 				)
