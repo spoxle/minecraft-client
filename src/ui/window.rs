@@ -17,7 +17,7 @@ impl WindowView {
 
 		Self {
 			sidebar,
-			footer: cx.new(|_|, footer::Footer::new()),
+			footer: cx.new(|_| footer::Footer::new()),
 			page,
 		}
 	}

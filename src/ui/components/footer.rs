@@ -39,6 +39,9 @@ impl Render for Footer {
 			.flex()
 			.flex_row()
 			.gap_1()
+			.bg(rgb(Theme::FOREGROUND))
+			.border_t_1()
+			.border_color(rgb(Theme::BORDER))
 			.children(
 				// task
 				self.current_task
@@ -61,6 +64,11 @@ impl Render for Footer {
 									.text_color(rgb(Theme::TEXT)),
 							)
 					}),
+			)
+			.child(
+				div()
+					.size_4()
+					.bg(rgb(0xff00ff)),
 			)
 	}
 }
