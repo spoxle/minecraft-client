@@ -18,7 +18,7 @@ impl Footer {
 	fn add_task(
 		&mut self,
 		task: impl Into<SharedString>,
-		cx: &mut Context<Self>,
+		_cx: &mut Context<Self>,
 	) {
 		let task = task.into();
 

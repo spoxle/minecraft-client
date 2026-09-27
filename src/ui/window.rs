@@ -7,9 +7,21 @@ use crate::ui::theme::Theme;
 pub struct WindowView {
 	sidebar: Entity<sidebar::Sidebar>,
 	footer: Entity<footer::Footer>,
+	page: Entity<page::Page>,
 }
 
 impl WindowView {
+	pub fn new(cx: &mut Context<Self>) -> Self {
+		let page = cx.new(page::Page::new);
+		let sidebar = cx.new(|cx| sidebar::Sidebar::new(page.clone(), cx));
+
+		Self {
+			sidebar,
+			footer: cx.new(|_|, footer::Footer::new()),
+			page,
+		}
+	}
+
 	pub fn run() {
 		Application::new()
 			.with_assets(Assets::new())
@@ -22,12 +34,7 @@ impl WindowView {
 						)),
 						..WindowOptions::default()
 					},
-					|_, cx| {
-						cx.new(|cx| WindowView {
-							sidebar: cx.new(|_| sidebar::Sidebar::new()),
-							footer: cx.new(|_| footer::Footer::new()),
-						})
-					},
+					|_, cx| cx.new(|cx| WindowView::new(cx)),
 				)
 				.unwrap();
 			});
@@ -43,6 +50,7 @@ impl Render for WindowView {
 		div()
 			.size_full()
 			.bg(rgb(Theme::BACKGROUND))
+			.text_color(rgb(Theme::TEXT))
 			.flex()
 			.flex_col()
 			.child(
@@ -51,13 +59,8 @@ impl Render for WindowView {
 					.flex()
 					.flex_row()
 					.flex_grow()
-					.child(self.sidebar.clone()) // sidebar component
-					.child(
-						// main content
-						div()
-							.flex_grow()
-							.bg(rgb(Theme::BACKGROUND)),
-					),
+					.child(self.sidebar.clone())
+					.child(self.page.clone()),
 			)
 			.child(self.footer.clone())
 	}

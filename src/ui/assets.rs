@@ -24,7 +24,12 @@ impl AssetSource for Assets {
 			.filter_map(|entry| {
 				entry
 					.ok()
-					.and_then(|entry| entry.file_name().into_string().ok())
+					.and_then(|entry| {
+						entry
+							.file_name()
+							.into_string()
+							.ok()
+					})
 					.map(SharedString::from)
 			})
 			.collect())

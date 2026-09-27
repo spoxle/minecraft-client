@@ -1,51 +1,27 @@
 use gpui::prelude::*;
 use gpui::*;
 
+use crate::ui::components::page::{Page, PageId};
 use crate::ui::theme::Theme;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum SidebarTab {
-	Library,
-	Explore,
-	Profile,
-	Settings,
-}
-
-impl SidebarTab {
-	const ALL: &'static [Self] = &[
-		Self::Library,
-		Self::Explore,
-		Self::Profile,
-		Self::Settings,
-	];
-
-	fn as_str(self) -> &'static str {
-		match self {
-			Self::Library => "library",
-			Self::Explore => "explore",
-			Self::Profile => "profile",
-			Self::Settings => "settings",
-		}
-	}
-}
-
 pub struct Sidebar {
-	pub active_tab: SidebarTab,
+	page: Entity<Page>,
 }
 
 impl Sidebar {
-	pub fn new() -> Self {
-		Self {
-			active_tab: SidebarTab::Library,
-		}
+	pub fn new(page: Entity<Page>, cx: &mut Context<Self>) -> Self {
+		cx.observe(&page, |_, _, cx| cx.notify())
+			.detach();
+
+		Self { page }
 	}
 
 	fn render_button(
 		&self,
-		tab: SidebarTab,
+		tab: PageId,
 		cx: &Context<Self>,
 	) -> impl IntoElement {
-		let is_active = self.active_tab == tab;
+		let is_active = self.page.read(cx).current() == tab;
 		let label = tab.as_str();
 		let icon_path = format!("icons/{label}.svg");
 		let icon_color = if is_active {
@@ -58,28 +34,21 @@ impl Sidebar {
 			.group(label)
 			.id(label)
 			.when(!is_active, |element| {
-				element.hover(|element| {
-					element.bg(rgb(Theme::SECONDARY))
-				})
+				element.hover(|element| element.bg(rgb(Theme::SECONDARY)))
 			})
-			.when(is_active, |element| {
-				element.bg(rgb(Theme::ACCENT))
-			})
-			.on_click(cx.listener(
-				move |sidebar, _, _, cx| {
-					sidebar.active_tab = tab;
-					cx.notify();
-				},
-			))
+			.when(is_active, |element| element.bg(rgb(Theme::ACCENT)))
+			.on_click(cx.listener(move |sidebar, _, _, cx| {
+				sidebar
+					.page
+					.update(cx, |page, cx| page.navigate(tab, cx));
+			}))
 			.p_2()
 			.rounded_lg()
 			.child(
 				svg()
 					.when(!is_active, |icon| {
 						icon.group_hover(label, |style| {
-							style.text_color(rgb(
-								Theme::TEXT,
-							))
+							style.text_color(rgb(Theme::TEXT))
 						})
 					})
 					.text_color(rgb(icon_color))
@@ -105,7 +74,7 @@ impl Render for Sidebar {
 			.border_r_1()
 			.border_color(rgb(Theme::BORDER))
 			.children(
-				SidebarTab::ALL
+				PageId::ALL
 					.iter()
 					.copied()
 					.map(|tab| self.render_button(tab, cx)),
